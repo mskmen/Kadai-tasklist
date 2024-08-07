@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import models.tasks;
 
+
+/**
+ * Servlet implementation class NewServlet
+ */
 @WebServlet("/new")
 public class NewServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -20,11 +24,13 @@ public class NewServlet extends HttpServlet {
      */
     public NewServlet() {
         super();
+        // TODO Auto-generated constructor stub
     }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // CSRF対策
         request.setAttribute("_token", request.getSession().getId());

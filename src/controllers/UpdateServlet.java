@@ -17,16 +17,16 @@ import models.validators.tasksValidator;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class CreateServlet
+ * Servlet implementation class UpdateServlet
  */
-@WebServlet("/create")
-public class CreateServlet extends HttpServlet {
+@WebServlet("/update")
+public class UpdateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateServlet() {
+    public UpdateServlet() {
         super();
     }
 
@@ -37,20 +37,19 @@ public class CreateServlet extends HttpServlet {
         String _token = request.getParameter("_token");
         if(_token != null && _token.equals(request.getSession().getId())) {
             EntityManager em = DBUtil.createEntityManager();
-            em.getTransaction().begin();
 
-            tasks m = new tasks();
+            // セッションスコープからメッセージのIDを取得して
+            // 該当のIDのメッセージ1件のみをデータベースから取得
+           tasks m = em.find(tasks.class, (Integer)(request.getSession().getAttribute("tasks_id")));
 
-
+            // フォームの内容を各フィールドに上書き
 
             String content = request.getParameter("content");
             m.setContent(content);
 
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            m.setCreated_at(currentTime);
-            m.setUpdated_at(currentTime);
-
-            // バリデーションを実行してエラーがあったら新規登録のフォームに戻る
+            m.setUpdated_at(currentTime);       // 更新日時のみ上書き
+            // バリデーションを実行してエラーがあったら編集画面のフォームに戻る
             List<String> errors = tasksValidator.validate(m);
             if(errors.size() > 0) {
                 em.close();
@@ -60,19 +59,22 @@ public class CreateServlet extends HttpServlet {
                 request.setAttribute("tasks", m);
                 request.setAttribute("errors", errors);
 
-                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/new.jsp");
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/edit.jsp");
                 rd.forward(request, response);
             } else {
-                // データベースに保存
-                em.persist(m);
-                em.getTransaction().commit();
-                request.getSession().setAttribute("flush", "登録が完了しました。");
-                em.close();
 
-                // indexのページにリダイレクト
-                response.sendRedirect(request.getContextPath() + "/index");
-            }
-    }
-    }
+            // データベースを更新
+            em.getTransaction().begin();
+            em.getTransaction().commit();
+            request.getSession().setAttribute("flush", "更新が完了しました。");
+            em.close();
 
+            // セッションスコープ上の不要になったデータを削除
+            request.getSession().removeAttribute("tasks_id");
+
+            // indexページへリダイレクト
+            response.sendRedirect(request.getContextPath() + "/index");
+        }
+    }
+}
 }
