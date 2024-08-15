@@ -43,11 +43,14 @@ public class IndexServlet extends HttpServlet {
                                    .setMaxResults(15)
                                    .getResultList();
 
+        // 全件数を取得
+        long tasks_count = (long)em.createNamedQuery("gettasksCount", Long.class)
+                                      .getSingleResult();
 
         em.close();
 
         request.setAttribute("tasks", tasks);
-
+        request.setAttribute("tasks_count", tasks_count);
         request.setAttribute("page", page);                         // ページ数
 
         if(request.getSession().getAttribute("flush") != null) {

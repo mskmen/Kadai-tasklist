@@ -6,13 +6,13 @@
         <c:choose>
             <c:when test="${tasks != null}">
 
-           <h2>id : ${tasks.id} のメッセージ詳細ページ</h2>
+           <h2>id : ${tasks.id} のタスク詳細ページ</h2>
 
                 <table>
                     <tbody>
 
                         <tr>
-                            <th>メッセージ</th>
+                            <th>タスク</th>
                             <td><c:out value="${tasks.content}" /></td>
                         </tr>
                         <tr>
